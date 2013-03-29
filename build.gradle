@@ -1,0 +1,32 @@
+buildscript {
+    repositories {
+        maven { url "http://127.0.0.1:8080/repository/internal" }
+        maven { url "http://clojars.org/repo" }
+    }
+
+    dependencies {
+        classpath "clojuresque:clojars:1.1.0"
+    }
+}
+
+group   = "clojuresque"
+version = "1.0.0-SNAPSHOT"
+
+apply plugin: "groovy"
+apply plugin: "signing"
+apply plugin: "clojars"
+
+repositories {
+    maven { url "http://127.0.0.1:8080/repository/internal" }
+    maven { url "http://clojars.org/repo" }
+}
+
+dependencies {
+    groovy localGroovy()
+
+    compile gradleApi()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "1.5"
+}
