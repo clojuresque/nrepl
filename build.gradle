@@ -18,6 +18,7 @@ apply plugin: "clojars"
 
 repositories {
     maven { url "http://127.0.0.1:8080/repository/internal" }
+    mavenCentral()
     maven { url "http://clojars.org/repo" }
 }
 
@@ -25,6 +26,8 @@ dependencies {
     groovy localGroovy()
 
     compile gradleApi()
+
+    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
 }
 
 task wrapper(type: Wrapper) {
