@@ -26,6 +26,7 @@ dependencies {
     groovy localGroovy()
 
     compile gradleApi()
+    runtime "clojuresque:clojuresque:1.5.4"
 
     testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
 }
