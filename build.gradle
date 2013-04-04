@@ -5,22 +5,17 @@ buildscript {
     }
 
     dependencies {
-        classpath "clojuresque:clojars:1.1.0"
+        classpath "de.kotka.gradle:gradle-plugin:1.0.1"
     }
 }
 
 group   = "clojuresque"
 version = "1.0.0-SNAPSHOT"
 
-apply plugin: "groovy"
-apply plugin: "signing"
-apply plugin: "clojars"
+ext."kotka.repository" = "clojuresque/nrepl"
 
-repositories {
-    maven { url "http://127.0.0.1:8080/repository/internal" }
-    mavenCentral()
-    maven { url "http://clojars.org/repo" }
-}
+apply plugin: "groovy"
+apply plugin: "kotka"
 
 dependencies {
     groovy localGroovy()
