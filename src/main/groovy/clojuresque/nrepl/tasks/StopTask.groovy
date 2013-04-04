@@ -23,7 +23,10 @@
 
 package clojuresque.nrepl.tasks
 
+import clojuresque.nrepl.Utils
+
 import org.gradle.api.DefaultTask
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.TaskAction
 
 public class StopTask extends DefaultTask {
@@ -31,26 +34,39 @@ public class StopTask extends DefaultTask {
         "d4:code35:(clojuresque.nrepl-server/shutdown)2:op4:evale".bytes
 
     def replInfo
+    def replPort
+
+    def getReplInfo() {
+        def info = Utils.lazyValue(this.replInfo)
+        info ? project.file(info) : null
+    }
+
+    def getReplPort() {
+        Utils.lazyValue(this.replPort, 0)
+    }
 
     void from(startTask) {
         replInfo = { -> startTask.replInfo }
+        replPort = { -> startTask.replPort }
     }
 
     @TaskAction
     void stopNRepl() {
-        File info = project.file(replInfo)
+        int  port = getReplPort()
+        File info = getReplInfo()
 
-        if (!info.exists())
-            return
+        if (info != null && info.exists())
+            port = Integer.parseInt(info.readLines().get(0))
 
-        int port = Integer.parseInt(info.readLines().get(0))
+        if (port > 0) {
+            Socket s = new Socket("127.0.0.1", port)
+            s.withStreams { input, output ->
+                output.write(command)
+                output.flush()
+            }
 
-        Socket s = new Socket("127.0.0.1", port)
-        s.withStreams { input, output ->
-            output.write(command)
-            output.flush()
-        }
-
-        info.delete()
+            info.delete()
+        } else
+            throw new InvalidUserDataException("Neither replInfo file nor port given. Cannot stop process!")
     }
 }

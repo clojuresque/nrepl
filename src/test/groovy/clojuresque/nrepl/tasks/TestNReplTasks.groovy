@@ -23,12 +23,14 @@
 
 package clojuresque.nrepl.tasks
 
+import org.gradle.api.GradleException
+import org.gradle.api.InvalidUserDataException
 import org.gradle.testfixtures.ProjectBuilder
 
 import spock.lang.Specification
 
 public class TestNReplTasks extends Specification {
-    def "starting and stopping the nrepl server works"() {
+    def "tasks communicate via info file"() {
         setup:
         def i = File.createTempFile("replInfo.", ".edn")
         def p = ProjectBuilder.builder().build()
@@ -88,5 +90,29 @@ public class TestNReplTasks extends Specification {
 
         cleanup:
         i.delete()
+    }
+
+    def "stop task requires either info file or explicit port"() {
+        setup:
+        def p = ProjectBuilder.builder().build()
+        p.apply from:
+            Thread.
+                currentThread().
+                    contextClassLoader.
+                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+
+        when:
+        def s = p.task("stopNRepl", type: StopTask)
+        s.execute()
+
+        then:
+        def e = thrown(GradleException)
+        rootCause(e) instanceof InvalidUserDataException
+    }
+
+    def rootCause(exc) {
+        while (exc.cause != null)
+            exc = exc.cause
+        return exc
     }
 }

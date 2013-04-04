@@ -57,15 +57,20 @@ public class StartTask extends DefaultTask {
                     []
                     (.close server)
                     (shutdown-agents))
-                  (with-open [writer (java.io.FileWriter. "%s")]
-                    (binding [*out* writer]
-                      (prn (:port server))
-                      (flush))))
+                  %s)
                 ''',
                 init.join(" "),
                 replPort,
-                project.file(replInfo).path.
-                    replaceAll("\\\\", "\\\\").
-                    replaceAll("\"", "\\\""))
+                replInfo ?
+                    String.format('''
+                        (with-open [writer (java.io.FileWriter. "%s")]
+                          (binding [*out* writer]
+                            (prn (:port server))
+                            (flush))))
+                        ''',
+                        project.file(replInfo).path.
+                            replaceAll("\\\\", "\\\\").
+                            replaceAll("\"", "\\\"")) :
+                    "")
     }
 }
