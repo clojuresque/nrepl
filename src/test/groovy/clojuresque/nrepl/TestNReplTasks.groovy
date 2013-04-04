@@ -28,7 +28,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
 public class TestNReplTasks extends Specification {
-    def startingAndStoppingTheNReplServerWorks() {
+    def "starting and stopping the nrepl server works"() {
         setup:
         def i = File.createTempFile("replInfo.", ".edn")
         def p = ProjectBuilder.builder().build()
@@ -61,5 +61,32 @@ public class TestNReplTasks extends Specification {
         cleanup:
         if (i.exists())
             i.delete()
+    }
+
+    def "starting the server respects initialisation"() {
+        setup:
+        def i = File.createTempFile("replInfo.", ".edn")
+        def p = ProjectBuilder.builder().build()
+        p.apply from:
+            Thread.
+                currentThread().
+                    contextClassLoader.
+                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+
+        when:
+        def t = p.task("startNRepl", type: StartTask)
+        t.replInfo = i
+        t.replClasspath = p.files(p.configurations.nrepl)
+        t.init << "(throw (Exception. \"Kill starting process!\"))"
+
+        t.execute()
+        // XXX: Wait for info file to be written.
+        Thread.sleep(5000)
+
+        then:
+        i.length() == 0
+
+        cleanup:
+        i.delete()
     }
 }

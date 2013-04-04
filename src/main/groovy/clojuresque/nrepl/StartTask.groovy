@@ -30,6 +30,7 @@ public class StartTask extends DefaultTask {
     def replInfo
     def replClasspath
     def int replPort = 0
+    def init = []
 
     @TaskAction
     void startNRepl() {
@@ -47,6 +48,7 @@ public class StartTask extends DefaultTask {
     String commandString() {
         String.format('''
                 (do
+                  %s
                   (ns clojuresque.nrepl-server)
                   (require 'clojure.tools.nrepl.server)
                   (def server
@@ -60,6 +62,7 @@ public class StartTask extends DefaultTask {
                       (prn (:port server))
                       (flush))))
                 ''',
+                init.join(" "),
                 replPort,
                 project.file(replInfo).path.
                     replaceAll("\\\\", "\\\\").
