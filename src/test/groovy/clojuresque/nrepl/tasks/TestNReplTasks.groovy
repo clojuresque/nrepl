@@ -151,6 +151,34 @@ public class TestNReplTasks extends Specification {
         rootCause(e) instanceof InvalidUserDataException
     }
 
+    def "stop task is configured lazily"() {
+        setup: "the temporary project used to run the tasks"
+        def p = buildProject()
+        def r = new Random()
+
+        and: "some random options are generated"
+        def input = File.createTempFile("replInfo.", ".edn")
+        def port  = r.nextInt(65536)
+
+        when: "the tasks are added"
+        def start = p.task("startNRepl", type: StartTask)
+        def stop  = p.task("stopNRepl",  type: StopTask)
+
+        and: "the stop task is configured from the start task"
+        stop.from start
+
+        and: "the start task is configured afterwards"
+        start.replInfo = input
+        start.replPort = port
+
+        then: "the stop inherits the configured options"
+        stop.replInfo == start.replInfo
+        stop.replPort == start.replPort
+
+        cleanup:
+        input.delete()
+    }
+
     /* Helper functions: */
     static buildProject() {
         def p = ProjectBuilder.builder().build()
