@@ -31,34 +31,53 @@ import spock.lang.Specification
 
 public class TestNReplTasks extends Specification {
     def "tasks communicate via info file"() {
-        setup:
+        setup: "the temporary replInfo file"
         def i = File.createTempFile("replInfo.", ".edn")
+
+        and: "the temporary project used to run the tasks"
         def p = ProjectBuilder.builder().build()
         p.apply from:
             Thread.
                 currentThread().
                     contextClassLoader.
                         getResource("clojuresque/nrepl/nrepl_test_params.gradle")
-
-        when:
+        when: "the start task is configured properly"
         def t = p.task("startNRepl", type: StartTask)
         t.replInfo = i
         t.replClasspath = p.files(p.configurations.nrepl)
+
+        and: "the stop task is configured properly"
         def s = p.task("stopNRepl", type: StopTask)
         s.from t
 
+        and: "the start task is executed"
         t.execute()
-        // XXX: What for info file to be written.
-        Thread.sleep(5000)
+        Thread.sleep(5000) // XXX: Wait for server spin-up.
 
-        then:
+        then: "the repl port is written to the replInfo file"
         i.length() > 0
 
-        when:
-        s.execute()
+        when: "the port is read"
+        def port = findReplInfo(i)
 
-        then:
+        and: "the connection is tried"
+        testConnection(port)
+
+        then: "it succeeds"
+        notThrown(ConnectException)
+
+        when: "the stop task is executed"
+        s.execute()
+        Thread.sleep(5000) // XXX: Wait for server spin-down.
+
+        then: "the repl info file is removed"
         !i.exists()
+
+        when: "the connection is tried again"
+        testConnection(port)
+
+        then: "it fails"
+        thrown(ConnectException)
 
         cleanup:
         if (i.exists())
@@ -66,8 +85,7 @@ public class TestNReplTasks extends Specification {
     }
 
     def "starting the server respects initialisation"() {
-        setup:
-        def i = File.createTempFile("replInfo.", ".edn")
+        setup: "the temporary project used to run the tasks"
         def p = ProjectBuilder.builder().build()
         p.apply from:
             Thread.
@@ -75,25 +93,25 @@ public class TestNReplTasks extends Specification {
                     contextClassLoader.
                         getResource("clojuresque/nrepl/nrepl_test_params.gradle")
 
-        when:
+        when: "the start task is configured properly"
         def t = p.task("startNRepl", type: StartTask)
-        t.replInfo = i
+        t.replPort = 4711
         t.replClasspath = p.files(p.configurations.nrepl)
         t.init << "(throw (Exception. \"Kill starting process!\"))"
 
+        and: "it is executed"
         t.execute()
-        // XXX: Wait for info file to be written.
-        Thread.sleep(5000)
+        Thread.sleep(5000) // XXX: Wait for server spin-up.
 
-        then:
-        i.length() == 0
+        and: "a connection is tried"
+        testConnection(4711)
 
-        cleanup:
-        i.delete()
+        then: "it fails"
+        thrown(ConnectException)
     }
 
     def "stop task requires either info file or explicit port"() {
-        setup:
+        setup: "the temporary project used to run the tasks"
         def p = ProjectBuilder.builder().build()
         p.apply from:
             Thread.
@@ -101,18 +119,30 @@ public class TestNReplTasks extends Specification {
                     contextClassLoader.
                         getResource("clojuresque/nrepl/nrepl_test_params.gradle")
 
-        when:
+        when: "the stop task is not properly configured"
         def s = p.task("stopNRepl", type: StopTask)
+
+        and: "it is executed"
         s.execute()
 
-        then:
+        then: "an InvalidUserDataException is thrown"
         def e = thrown(GradleException)
         rootCause(e) instanceof InvalidUserDataException
     }
 
-    def rootCause(exc) {
+    /* Helper functions: */
+    static rootCause(exc) {
         while (exc.cause != null)
             exc = exc.cause
         return exc
+    }
+
+    static findReplInfo(file) {
+        Integer.parseInt(file.readLines().first())
+    }
+
+    static testConnection(port) {
+        def s = new Socket("127.0.0.1", port)
+        s.close()
     }
 }
