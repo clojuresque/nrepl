@@ -21,51 +21,36 @@
  * THE SOFTWARE.
  */
 
-package clojuresque.nrepl
+package clojuresque.nrepl.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-public class StartTask extends DefaultTask {
-    def replInfo
-    def replClasspath
-    def int replPort = 0
-    def init = []
+public class StopTask extends DefaultTask {
+    final static byte[] command =
+        "d4:code35:(clojuresque.nrepl-server/shutdown)2:op4:evale".bytes
 
-    @TaskAction
-    void startNRepl() {
-        ant.java(
-            classname: "clojure.main",
-            spawn:     true,
-            fork:      true
-        ) {
-            classpath path: project.files(this.replClasspath).asPath
-            arg value: "-e"
-            arg value: this.commandString()
-        }
+    def replInfo
+
+    void from(startTask) {
+        replInfo = { -> startTask.replInfo }
     }
 
-    String commandString() {
-        String.format('''
-                (do
-                  %s
-                  (ns clojuresque.nrepl-server)
-                  (require 'clojure.tools.nrepl.server)
-                  (def server
-                    (clojure.tools.nrepl.server/start-server :port %d))
-                  (defn shutdown
-                    []
-                    (.close server)
-                    (shutdown-agents))
-                  (with-open [writer (java.io.FileWriter. "%s")]
-                    (binding [*out* writer]
-                      (prn (:port server))
-                      (flush))))
-                ''',
-                init.join(" "),
-                replPort,
-                project.file(replInfo).path.
-                    replaceAll("\\\\", "\\\\").
-                    replaceAll("\"", "\\\""))
+    @TaskAction
+    void stopNRepl() {
+        File info = project.file(replInfo)
+
+        if (!info.exists())
+            return
+
+        int port = Integer.parseInt(info.readLines().get(0))
+
+        Socket s = new Socket("127.0.0.1", port)
+        s.withStreams { input, output ->
+            output.write(command)
+            output.flush()
+        }
+
+        info.delete()
     }
 }

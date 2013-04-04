@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-package clojuresque.nrepl
+package clojuresque.nrepl.tasks
 
 import org.gradle.testfixtures.ProjectBuilder
 

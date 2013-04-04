@@ -23,6 +23,9 @@
 
 package clojuresque.nrepl
 
+import clojuresque.nrepl.tasks.StartTask
+import clojuresque.nrepl.tasks.StopTask
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
