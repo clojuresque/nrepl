@@ -84,6 +84,44 @@ public class TestNReplTasks extends Specification {
             i.delete()
     }
 
+    def "tasks communicate via explicit port configuration"() {
+        setup: "the temporary project used to run the tasks"
+        def p = ProjectBuilder.builder().build()
+        p.apply from:
+            Thread.
+                currentThread().
+                    contextClassLoader.
+                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+        when: "the start task is configured properly"
+        def t = p.task("startNRepl", type: StartTask)
+        t.replPort = 4711
+        t.replClasspath = p.files(p.configurations.nrepl)
+
+        and: "the stop task is configured properly"
+        def s = p.task("stopNRepl", type: StopTask)
+        s.from t
+
+        and: "the start task is executed"
+        t.execute()
+        Thread.sleep(5000) // XXX: Wait for server spin-up.
+
+        and: "the connection is tried"
+        testConnection(4711)
+
+        then: "it succeeds"
+        notThrown(ConnectException)
+
+        when: "the stop task is executed"
+        s.execute()
+        Thread.sleep(5000) // XXX: Wait for server spin-down.
+
+        and: "the connection is tried again"
+        testConnection(4711)
+
+        then: "it fails"
+        thrown(ConnectException)
+    }
+
     def "starting the server respects initialisation"() {
         setup: "the temporary project used to run the tasks"
         def p = ProjectBuilder.builder().build()
