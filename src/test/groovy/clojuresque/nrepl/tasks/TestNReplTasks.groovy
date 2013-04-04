@@ -25,6 +25,7 @@ package clojuresque.nrepl.tasks
 
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.logging.LogLevel
 import org.gradle.testfixtures.ProjectBuilder
 
 import spock.lang.Specification
@@ -35,12 +36,8 @@ public class TestNReplTasks extends Specification {
         def i = File.createTempFile("replInfo.", ".edn")
 
         and: "the temporary project used to run the tasks"
-        def p = ProjectBuilder.builder().build()
-        p.apply from:
-            Thread.
-                currentThread().
-                    contextClassLoader.
-                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+        def p = buildProject()
+
         when: "the start task is configured properly"
         def t = p.task("startNRepl", type: StartTask)
         t.replInfo = i
@@ -86,12 +83,8 @@ public class TestNReplTasks extends Specification {
 
     def "tasks communicate via explicit port configuration"() {
         setup: "the temporary project used to run the tasks"
-        def p = ProjectBuilder.builder().build()
-        p.apply from:
-            Thread.
-                currentThread().
-                    contextClassLoader.
-                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+        def p = buildProject()
+
         when: "the start task is configured properly"
         def t = p.task("startNRepl", type: StartTask)
         t.replPort = 4711
@@ -124,12 +117,7 @@ public class TestNReplTasks extends Specification {
 
     def "starting the server respects initialisation"() {
         setup: "the temporary project used to run the tasks"
-        def p = ProjectBuilder.builder().build()
-        p.apply from:
-            Thread.
-                currentThread().
-                    contextClassLoader.
-                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+        def p = buildProject()
 
         when: "the start task is configured properly"
         def t = p.task("startNRepl", type: StartTask)
@@ -150,12 +138,7 @@ public class TestNReplTasks extends Specification {
 
     def "stop task requires either info file or explicit port"() {
         setup: "the temporary project used to run the tasks"
-        def p = ProjectBuilder.builder().build()
-        p.apply from:
-            Thread.
-                currentThread().
-                    contextClassLoader.
-                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+        def p = buildProject()
 
         when: "the stop task is not properly configured"
         def s = p.task("stopNRepl", type: StopTask)
@@ -169,6 +152,18 @@ public class TestNReplTasks extends Specification {
     }
 
     /* Helper functions: */
+    static buildProject() {
+        def p = ProjectBuilder.builder().build()
+        // TODO: Doesn't work. Gradle issue?
+        p.logging.level = LogLevel.INFO
+        p.apply from:
+            Thread.
+                currentThread().
+                    contextClassLoader.
+                        getResource("clojuresque/nrepl/nrepl_test_params.gradle")
+        return p
+    }
+
     static rootCause(exc) {
         while (exc.cause != null)
             exc = exc.cause
