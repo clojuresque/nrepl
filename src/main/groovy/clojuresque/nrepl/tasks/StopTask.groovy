@@ -55,8 +55,10 @@ public class StopTask extends DefaultTask {
         int  port = getReplPort()
         File info = getReplInfo()
 
-        if (info != null && info.exists())
+        if (info != null && info.exists()) {
             port = Integer.parseInt(info.readLines().get(0))
+            info.delete()
+        }
 
         if (port > 0) {
             Socket s = new Socket("127.0.0.1", port)
@@ -64,8 +66,6 @@ public class StopTask extends DefaultTask {
                 output.write(command)
                 output.flush()
             }
-
-            info.delete()
         } else
             throw new InvalidUserDataException("Neither replInfo file nor port given. Cannot stop process!")
     }
