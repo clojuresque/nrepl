@@ -41,6 +41,6 @@ public class TestNReplPlugin extends Specification {
         then:
         p.startNRepl instanceof StartTask
         p.stopNRepl  instanceof StopTask
-        p.file(p.startNRepl.replInfo) == p.file(p.stopNRepl.replInfo)
+        p.startNRepl.replInfo == p.stopNRepl.replInfo
     }
 }
