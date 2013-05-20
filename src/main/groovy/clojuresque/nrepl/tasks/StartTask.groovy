@@ -85,7 +85,7 @@ public class StartTask extends DefaultTask {
                         (with-open [writer (java.io.FileWriter. "%s")]
                           (binding [*out* writer]
                             (prn (:port server))
-                            (flush))))
+                            (flush)))
                         ''',
                         info.
                             path.
