@@ -18,8 +18,7 @@ apply plugin: "groovy"
 apply plugin: "kotka"
 
 dependencies {
-    groovy localGroovy()
-
+    compile localGroovy()
     compile gradleApi()
     runtime "clojuresque:clojuresque:1.5.4"
 
@@ -27,5 +26,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "1.5"
+    gradleVersion = "1.6"
 }
