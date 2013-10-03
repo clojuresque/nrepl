@@ -1,30 +1,73 @@
 buildscript {
     repositories {
-        maven { url "http://127.0.0.1:8080/repository/internal" }
+        mavenCentral()
         maven { url "http://clojars.org/repo" }
     }
 
     dependencies {
-        classpath "de.kotka.gradle:gradle-plugin:1.0.1"
+        classpath "de.kotka.gradle:gradle-plugin:1.1.0"
     }
 }
 
-group   = "clojuresque"
-version = "1.1.0-SNAPSHOT"
+subprojects {
+    group = 'clojuresque'
+    version = '1.0.0-SNAPSHOT'
 
-ext."kotka.repository" = "clojuresque/nrepl"
+    ext.kotka = [
+        repository:     "clojuresque/nrepl",
+        wrapperVersion: "1.8"
+    ]
 
-apply plugin: "groovy"
-apply plugin: "kotka"
+    apply {
+        plugin 'java'
+        plugin 'kotka'
+    }
 
-dependencies {
-    compile localGroovy()
-    compile gradleApi()
-    runtime "clojuresque:clojuresque:1.5.4"
+    repositories {
+        mavenCentral()
+    }
+}
 
-    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
+project(':clojuresque-nrepl') {
+    description = "A Clojure plugin for gradle (nrepl)"
+
+    apply plugin: 'groovy'
+
+    dependencies {
+        compile gradleApi()
+        compile localGroovy()
+
+        compile "de.kotka.gradle:gradle-utils:0.1.1"
+        compile "clojuresque:clojuresque-base:1.6.0-SNAPSHOT"
+
+        testCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
+            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        }
+    }
+
+    compileGroovy {
+        sourceCompatibility = "1.6"
+        targetCompatibility = "1.6"
+    }
+
+    processResources {
+        inputs.property "version", {-> project.version}
+        from(sourceSets.main.resources.srcDirs) {
+            expand("version": project.version)
+        }
+    }
+}
+
+project(':clojuresque-nrepl-runtime') {
+    description = "A Clojure plugin for gradle (nrepl runtime files)"
+
+    apply plugin: "java"
+
+    dependencies {
+        compile "clojuresque:clojuresque-base-runtime:1.6.0-SNAPSHOT"
+    }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "1.6"
+    gradleVersion = "1.8"
 }

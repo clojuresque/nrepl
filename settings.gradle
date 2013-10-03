@@ -1,1 +1,3 @@
-rootProject.name = "nrepl"
+rootProject.name = "root-nrepl"
+include "clojuresque-nrepl"
+include "clojuresque-nrepl-runtime"
