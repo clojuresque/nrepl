@@ -23,6 +23,8 @@
 
 package clojuresque.tasks
 
+import clojuresque.Util
+
 import kotka.gradle.utils.ConfigureUtil
 import kotka.gradle.utils.Delayed
 
@@ -84,15 +86,16 @@ class ClojureRepl extends DefaultTask {
 
     @TaskAction
     void startRepl() {
-        def options = [ "--port", port ]
-        if (handler != null)
-            options += [ "--handler", handler ]
+        def options = [
+            port:    port,
+            handler: handler
+        ]
 
         project.clojureexec {
-            ConfigureUtil.configure delegate, this.jvmOptions
-            classpath = this.classpath
+            ConfigureUtil.configure delegate, this.getJvmOptions()
+            classpath = this.getClasspath()
             main = "clojuresque.tasks.repl/start-repl"
-            args = options
+            standardInput = Util.optionsToStream(options)
         }
     }
 }

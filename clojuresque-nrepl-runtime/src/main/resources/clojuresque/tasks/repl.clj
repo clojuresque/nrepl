@@ -1,18 +1,13 @@
 (ns clojuresque.tasks.repl
   (:require
-    [clojuresque.cli :as cli]
     [clojuresque.util :as util]
     [clojure.tools.nrepl.server :as repl]))
 
 (def barrier (promise))
 (def server nil)
 
-(cli/deftask start-repl
-  "Start a nrepl server on the given port. An optional handler
-  may be given as fully-qualified symbol. The repl server may
-  be stopped via clojuresque.tasks.repl/stop-server."
-  [[port     p "server port"]
-   [handler  h "handler function" nil]]
+(util/deftask start-repl
+  [{:keys [port handler]}]
   (let [p (Long/parseLong port)
         h (if handler
             (let [custom-handler (util/resolve-required handler)]
