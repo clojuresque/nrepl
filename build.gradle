@@ -26,6 +26,11 @@ subprojects {
     repositories {
         mavenCentral()
     }
+
+    ext.clojuresquePlugins = [
+        common: "1.1.0",
+        base:   "1.6.0"
+    ]
 }
 
 project(':clojuresque-nrepl') {
@@ -38,7 +43,9 @@ project(':clojuresque-nrepl') {
         compile localGroovy()
 
         compile "de.kotka.gradle:gradle-utils:0.1.1"
-        compile "clojuresque:clojuresque-base:1.6.0-SNAPSHOT"
+        project.clojuresquePlugins.each { plugin, version ->
+            compile "clojuresque:clojuresque-${plugin}:${version}"
+        }
 
         testCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
@@ -64,7 +71,9 @@ project(':clojuresque-nrepl-runtime') {
     apply plugin: "java"
 
     dependencies {
-        compile "clojuresque:clojuresque-base-runtime:1.6.0-SNAPSHOT"
+        project.clojuresquePlugins.each { plugin, version ->
+            compile "clojuresque:clojuresque-${plugin}-runtime:${version}"
+        }
     }
 }
 
