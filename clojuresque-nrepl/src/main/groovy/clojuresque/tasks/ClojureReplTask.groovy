@@ -30,6 +30,43 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Starts a nrepl server for the project.
+ *
+ * To provide your own handler, eg. to use custom nrepl middlewares,
+ * put the code into a separate sourceSet and tell the task to use
+ * your specific handler factory.
+ *
+ * <pre><code>sourceSets { dev }
+ *
+ * clojureRepl {
+ *      handler = "my.repl/handler"
+ * }
+ * </code></pre>
+ *
+ * And in <code>src/dev/clojure/my/repl.clj</code>:
+ * <pre><code>(ns my.repl
+ *   (:require
+ *     [clojure.tools.nrepl.server :as repl]))
+ *
+ * (defn handler
+ *   []
+ *   (repl/default-handler #'my-middleware))
+ * </code></pre>
+ *
+ * <em>Note:</em> You have to specify the nrepl version to use
+ * manually. Eg. by using the “development” configuration or
+ * as part of your application.
+ *
+ * <h2>Caveats</h2>
+ * <ul>
+ *   <li>The server keeps running in the current console.
+ *     Currently there is no way to background the process.</li>
+ *   <li>Parallel builds usually work. Unless the <code>build.gradle</code>
+ *     is touched between the runs. Then the repl has to be stopped
+ *     and restarted afresh to allow again parallel builds.</li>
+ * </ul>
+ */
 public class ClojureReplTask extends DefaultTask {
     @InputFiles
     @Delayed
