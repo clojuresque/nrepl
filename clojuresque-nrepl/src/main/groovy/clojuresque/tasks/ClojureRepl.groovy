@@ -67,7 +67,7 @@ import org.gradle.api.tasks.TaskAction
  *     and restarted afresh to allow again parallel builds.</li>
  * </ul>
  */
-public class ClojureReplTask extends DefaultTask {
+class ClojureRepl extends DefaultTask {
     @InputFiles
     @Delayed
     def classpath
@@ -83,7 +83,7 @@ public class ClojureReplTask extends DefaultTask {
     def handler
 
     @TaskAction
-    public void startRepl() {
+    void startRepl() {
         def options = [ "--port", port ]
         if (handler != null)
             options += [ "--handler", handler ]

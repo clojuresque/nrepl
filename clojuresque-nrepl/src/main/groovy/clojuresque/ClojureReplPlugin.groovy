@@ -23,7 +23,7 @@
 
 package clojuresque
 
-import clojuresque.tasks.ClojureReplTask
+import clojuresque.tasks.ClojureRepl
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,7 +36,7 @@ class ClojureReplPlugin implements Plugin<Project> {
             project.sourceSets.main.getCompileTaskName("clojure")
         def compileTask = project.tasks[compileTaskName]
 
-        project.task("clojureRepl", type: ClojureReplTask) {
+        project.task("clojureRepl", type: ClojureRepl) {
             port = 7888
             delayedJvmOptions = { compileTask.jvmOptions }
             delayedClasspath  = {
