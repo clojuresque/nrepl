@@ -7,8 +7,10 @@
 (def server nil)
 
 (util/deftask start-repl
-  [{:keys [port handler]}]
-  (let [p (Long/parseLong port)
+  [{:keys [port handler middleware]}]
+  (let [p (if (string? port)
+            (Long/parseLong port)
+            port)
         h (if handler
             (let [custom-handler (util/resolve-required handler)]
               (when-not custom-handler
