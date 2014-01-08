@@ -16,7 +16,7 @@
               (let [custom-handler (util/resolve-required handler)]
                 (when-not custom-handler
                   (throw (Exception. (str "Unknown handler: " handler))))
-                (custom-handler))
+                @custom-handler)
               (apply repl/default-handler mw))
         s   (repl/start-server :port p :handler h)]
     (println "Repl started on port" port)
