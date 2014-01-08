@@ -8,16 +8,17 @@
 
 (util/deftask start-repl
   [{:keys [port handler middleware]}]
-  (let [p (if (string? port)
-            (Long/parseLong port)
-            port)
-        h (if handler
-            (let [custom-handler (util/resolve-required handler)]
-              (when-not custom-handler
-                (throw (Exception. (str "Unknown handler: " handler))))
-              (custom-handler))
-            (repl/default-handler))
-        s (repl/start-server :port p :handler h)]
+  (let [p   (if (string? port)
+              (Long/parseLong port)
+              port)
+        mw  (map util/resolve-required middleware)
+        h   (if handler
+              (let [custom-handler (util/resolve-required handler)]
+                (when-not custom-handler
+                  (throw (Exception. (str "Unknown handler: " handler))))
+                (custom-handler))
+              (apply repl/default-handler mw))
+        s   (repl/start-server :port p :handler h)]
     (println "Repl started on port" port)
     (alter-var-root #'server (constantly s)))
   @barrier)

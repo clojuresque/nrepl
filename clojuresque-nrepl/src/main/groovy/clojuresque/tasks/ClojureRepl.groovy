@@ -56,6 +56,16 @@ import org.gradle.api.tasks.TaskAction
  *   (repl/default-handler #'my-middleware))
  * </code></pre>
  *
+ * If all you want is to specify custom middleware, there is a
+ * short-hand in the <code>middleware</code> option. Here you can
+ * specify the fully-qualified names of the middleware in the desired
+ * order.
+ *
+ * <pre><code>clojureRepl {
+ *     middleware &lt;&lt; "my.repl/middleware"
+ * }
+ * </code></pre>
+ *
  * <em>Note:</em> You have to specify the nrepl version to use
  * manually. Eg. by using the “development” configuration or
  * as part of your application.
@@ -83,12 +93,14 @@ class ClojureRepl extends DefaultTask {
 
     def port
     def handler
+    def middleware = []
 
     @TaskAction
     void startRepl() {
         def options = [
             port:    port,
-            handler: handler
+            handler: handler,
+            middleware: middleware
         ]
 
         project.clojureexec {
