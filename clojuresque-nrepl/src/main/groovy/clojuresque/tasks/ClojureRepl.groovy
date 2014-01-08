@@ -39,7 +39,7 @@ import org.gradle.api.tasks.TaskAction
  * put the code into a separate sourceSet and tell the task to use
  * your specific handler factory.
  *
- * <pre><code>sourceSets { dev }
+ * <pre><code> sourceSets { dev }
  *
  * clojureRepl {
  *      handler = "my.repl/handler"
@@ -47,7 +47,7 @@ import org.gradle.api.tasks.TaskAction
  * </code></pre>
  *
  * And in <code>src/dev/clojure/my/repl.clj</code>:
- * <pre><code>(ns my.repl
+ * <pre><code> (ns my.repl
  *   (:require
  *     [clojure.tools.nrepl.server :as repl]))
  *
@@ -61,13 +61,13 @@ import org.gradle.api.tasks.TaskAction
  * specify the fully-qualified names of the middleware in the desired
  * order.
  *
- * <pre><code>clojureRepl {
+ * <pre><code> clojureRepl {
  *     middleware &lt;&lt; "my.repl/middleware"
  * }
  * </code></pre>
  *
  * <em>Note:</em> You have to specify the nrepl version to use
- * manually. Eg. by using the “development” configuration or
+ * manually. Eg. by using the <code>development</code> configuration or
  * as part of your application.
  *
  * <h2>Caveats</h2>
@@ -80,19 +80,46 @@ import org.gradle.api.tasks.TaskAction
  * </ul>
  */
 class ClojureRepl extends DefaultTask {
+    /**
+     * Classpath required to generate the documentation.
+     */
     @InputFiles
     @Delayed
     def classpath
 
+    /**
+     * Adds the given files to classpath. <code>fs</code> is subject
+     * to expansion via <code>project.files</code>.
+     *
+     * @param  fs   Files/directories to add to the classpath
+     * @return      Returns <code>this</code>.
+     */
     def classpath(Object... fs) {
         classpath = this.getClasspath().plus(project.files(fs))
+        this
     }
 
+    /**
+     * A <code>Closure</code> configuring the underlying exec spec.
+     * This may be used to set eg. heap sizes etc.
+     */
     @Delayed
     def jvmOptions
 
+    /**
+     * The port for the repl server to listen on. A string or integer.
+     */
     def port
+
+    /**
+     * The fully qualified name of the repl handler.
+     */
     def handler
+
+    /**
+     * A list of fully qualified names of middlewares. <em>Note:</em>
+     * unused in case a custom <code>handler</code> is set.
+     */
     def middleware = []
 
     @TaskAction
