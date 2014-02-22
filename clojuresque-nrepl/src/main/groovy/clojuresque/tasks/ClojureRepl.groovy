@@ -125,7 +125,7 @@ class ClojureRepl extends DefaultTask {
     @TaskAction
     void startRepl() {
         def options = [
-            port:    port,
+            port:    "$port",
             handler: handler,
             middleware: middleware
         ]
