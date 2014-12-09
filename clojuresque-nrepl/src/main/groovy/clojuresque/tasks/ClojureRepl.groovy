@@ -66,6 +66,16 @@ import org.gradle.api.tasks.TaskAction
  * }
  * </code></pre>
  *
+ * Some environments need certain support code to be initialized from
+ * the classpath. For example David Greenberg's redl or Petit Laurent's
+ * counterclockwise. You can specify such namespaces via the
+ * <code>injections</code> option.
+ *
+ * <pre><code> clojureRepl {
+ *     injections = [ "redl.core", "redl.complete", "ccw.debug.serverrepl" ]
+ * }
+ * </code></pre>
+ *
  * <em>Note:</em> You have to specify the nrepl version to use
  * manually. Eg. by using the <code>development</code> configuration or
  * as part of your application.
@@ -122,12 +132,19 @@ class ClojureRepl extends DefaultTask {
      */
     def middleware = []
 
+    /**
+     * A list of namespaces which need to be reqired to initialise
+     * the repl environment.
+     */
+    def injections = []
+
     @TaskAction
     void startRepl() {
         def options = [
             port:    port,
             handler: handler,
-            middleware: middleware
+            middleware: middleware,
+            injections: injections
         ]
 
         project.clojureexec {

@@ -7,7 +7,9 @@
 (def server nil)
 
 (util/deftask start-repl
-  [{:keys [port handler middleware]}]
+  [{:keys [port handler middleware injections]}]
+  (when-let [injections (seq injections)]
+    (apply require (map symbol injections)))
   (let [p   (if (string? port)
               (Long/parseLong port)
               port)
