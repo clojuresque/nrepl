@@ -21,7 +21,8 @@
                 @custom-handler)
               (apply repl/default-handler mw))
         s   (repl/start-server :port p :handler h)]
-    (println "Repl started on port" port)
+    (println
+      (format "nREPL server started on port %1$d on host 127.0.0.1 - nrepl://127.0.0.1:%1$d" port))
     (alter-var-root #'server (constantly s)))
   @barrier)
 
