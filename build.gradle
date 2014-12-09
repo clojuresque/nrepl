@@ -1,11 +1,11 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url "http://clojars.org/repo" }
     }
 
     dependencies {
-        classpath "de.kotka.gradle:gradle-plugin:1.2.0"
+        classpath "de.kotka.gradle:gradle-plugin:1.3.0"
     }
 }
 
@@ -15,7 +15,7 @@ subprojects {
 
     ext.kotka = [
         repository:     "clojuresque/nrepl",
-        wrapperVersion: "1.10"
+        wrapperVersion: "2.1"
     ]
 
     apply {
@@ -24,7 +24,8 @@ subprojects {
     }
 
     repositories {
-        mavenCentral()
+        jcenter()
+        maven { url "http://clojars.org/repo" }
     }
 
     ext.clojuresquePlugins = [
@@ -75,8 +76,4 @@ project(':clojuresque-nrepl-runtime') {
             compile "clojuresque:clojuresque-${plugin}-runtime:${version}"
         }
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = "1.10"
 }
