@@ -147,11 +147,19 @@ class ClojureRepl extends DefaultTask {
             injections: injections
         ]
 
+        def runtime = [
+            "clojuresque/util.clj",
+            "clojuresque/tasks/repl.clj"
+        ].collect { this.class.classLoader.getResourceAsStream(it) }
+
         project.clojureexec {
             ConfigureUtil.configure delegate, this.getJvmOptions()
             classpath = this.getClasspath()
-            main = "clojuresque.tasks.repl/start-repl"
-            standardInput = Util.optionsToStream(options)
+            standardInput = Util.toInputStream([
+                runtime,
+                "(clojuresque.tasks.repl/start-repl)",
+                Util.optionsToStream(options)
+            ])
         }
     }
 }

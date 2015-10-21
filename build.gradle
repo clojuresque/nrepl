@@ -7,7 +7,7 @@ plugins {
 apply plugin: "java"
 apply plugin: "groovy"
 
-group = 'clojuresque'
+group = 'de.kotka.clojuresque'
 version = '1.3.0-SNAPSHOT'
 description = "A Clojure plugin for gradle (nrepl)"
 
@@ -20,21 +20,20 @@ kotka {
 
 repositories {
     jcenter()
-    maven { url "http://clojars.org/repo" }
 }
 
 ext.clojuresquePlugins = [
-    common: "1.1.0",
-    base:   "1.6.0"
+    common: "2.0.0",
+    base:   "2.0.0"
 ]
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile "de.kotka.gradle:gradle-utils:0.1.1"
+    compile "de.kotka.gradle:gradle-utils:0.2.2"
     project.clojuresquePlugins.each { plugin, version ->
-        compile "clojuresque:clojuresque-${plugin}:${version}"
+        compile "de.kotka.clojuresque:clojuresque-${plugin}:${version}"
     }
 
     testCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
@@ -45,11 +44,4 @@ dependencies {
 compileGroovy {
     sourceCompatibility = "1.6"
     targetCompatibility = "1.6"
-}
-
-processResources {
-    inputs.property "version", {-> project.version}
-    from(sourceSets.main.resources.srcDirs) {
-        expand("version": project.version)
-    }
 }

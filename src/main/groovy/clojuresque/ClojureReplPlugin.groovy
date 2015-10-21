@@ -30,7 +30,7 @@ import org.gradle.api.Project
 
 class ClojureReplPlugin implements Plugin<Project> {
     void apply(Project project) {
-        project.apply plugin: "clojure-base"
+        project.apply plugin: "de.kotka.clojuresque.base"
 
         def compileTaskName =
             project.sourceSets.main.getCompileTaskName("clojure")
@@ -53,14 +53,6 @@ class ClojureReplPlugin implements Plugin<Project> {
             }
             description = "Run Clojure repl."
             group = ClojureBasePlugin.CLOJURE_GROUP
-        }
-
-        def props = Util.properties("nrepl")
-
-        project.dependencies {
-            clojuresque group: "clojuresque",
-                name: "clojuresque-nrepl-runtime",
-                version: props.getProperty("clojuresque.nrepl.version")
         }
     }
 }

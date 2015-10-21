@@ -1,7 +1,8 @@
 (ns clojuresque.tasks.repl
   (:require
-    [clojuresque.util :as util]
     [clojure.tools.nrepl.server :as repl]))
+
+(alias 'util 'clojuresque.util)
 
 (def barrier (promise))
 (def server nil)
