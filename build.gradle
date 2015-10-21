@@ -45,3 +45,17 @@ compileGroovy {
     sourceCompatibility = "1.6"
     targetCompatibility = "1.6"
 }
+
+pluginBundle {
+    website = 'https://bitbucket.org/clojuresque/nrepl'
+    vcsUrl = 'https://bitbucket.org/clojuresque/nrepl'
+    description = project.description
+    tags = ['clojure']
+
+    plugins {
+        nreplPlugin {
+            id = 'de.kotka.clojuresque.nrepl'
+            displayName = project.description
+        }
+    }
+}
