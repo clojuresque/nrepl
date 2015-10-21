@@ -20,8 +20,9 @@
                 (when-not custom-handler
                   (throw (Exception. (str "Unknown handler: " handler))))
                 @custom-handler)
-              (apply repl/default-handler mw))
-        s   (repl/start-server :port p :handler h)]
+              (repl/default-handler))
+        wh  (reduce (fn [h mw] (mw h)) h (reverse mw))
+        s   (repl/start-server :port p :handler wh)]
     (println
       (format "nREPL server started on port %1$d on host 127.0.0.1 - nrepl://127.0.0.1:%1$d" port))
     (alter-var-root #'server (constantly s)))
