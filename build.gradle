@@ -1,29 +1,21 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url "http://clojars.org/repo" }
-    }
-
-    dependencies {
-        classpath "de.kotka.gradle:gradle-plugin:1.3.0"
-    }
+plugins {
+    id "com.jfrog.bintray" version "1.4"
+    id "com.gradle.plugin-publish" version "0.9.1"
+    id "de.kotka.project" version "1.5.1"
 }
 
-import kotka.gradle.KotkaPlugin
+apply plugin: "java"
+apply plugin: "groovy"
 
 group = 'clojuresque'
 version = '1.3.0-SNAPSHOT'
 description = "A Clojure plugin for gradle (nrepl)"
 
-ext.kotka = [
-    repository:     "clojuresque/nrepl",
-    wrapperVersion: "2.1"
-]
-
-apply {
-    plugin 'java'
-    plugin 'groovy'
-    plugin 'kotka'
+kotka {
+    wrapperVersion = "2.1"
+    licenses   = [ "MIT" ]
+    repository = "clojuresque/nrepl"
+    bintray    = [ repo: "clojuresque" ]
 }
 
 repositories {
@@ -35,10 +27,6 @@ ext.clojuresquePlugins = [
     common: "1.1.0",
     base:   "1.6.0"
 ]
-
-uploadArchives {
-    configuration = project.configurations.signatures
-}
 
 dependencies {
     compile gradleApi()
